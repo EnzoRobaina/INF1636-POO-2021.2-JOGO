@@ -804,6 +804,7 @@ class TabuleiroView extends JPanel implements MouseListener, Observador, Observa
 		    		int yFim = montaIJ(coordenadasCasas[i][j], "yFim");
 		    		if ((mouseX >= xIni && mouseX <= xFim) && (mouseY >= yIni && mouseY <= yFim)) {
 		    			posValida = true;
+		    			
 		    			System.out.println("i:"+i+ ",j:"+j);
 		    			break;
 		    		}
