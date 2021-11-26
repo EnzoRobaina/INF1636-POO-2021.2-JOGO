@@ -4,19 +4,19 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import controller.ControllerFacade;
-import model.ModelFacade;
+import util.Observavel;
+import util.Observador;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.nio.*;
 import java.awt.geom.*;
-import java.lang.Math.*;
+import java.util.List;
 
 
-class TabuleiroView extends JPanel implements MouseListener{
+class TabuleiroView extends JPanel implements MouseListener, Observador, Observavel {
 	private final int linhas = 6, colunas = 24;
 	private String[][] coordenadasCasas = new String[linhas][colunas];
 	private Image imgTabuleiro = null;
@@ -37,7 +37,7 @@ class TabuleiroView extends JPanel implements MouseListener{
 	private final int BUTTON_SPACE = 60;
 	private final int BUTTON_START_X = 775;
 	private final int BUTTON_START_Y = 330;
-	private JButton btLancaDado = new JButton("Lançar Dados");
+	private JButton btLancaDado = new JButton("Lanï¿½ar Dados");
 	private int dado1 = 0;
 	private int dado2 = 0;
 	private String dadoCol = null;
@@ -63,19 +63,19 @@ class TabuleiroView extends JPanel implements MouseListener{
 	private int indiceCorDaVez = 0;
 	private boolean posValida = false;
 	private int expX;
-	private int expY;	
-	
+	private int expY;
+
 	public TabuleiroView() {
 		try {
 			//imgTabuleiro = ImageIO.read(new File("D:\\Eclipse Workspaces\\INF1636_Jogo_Novo\\INF1636-POO-2021.2-JOGO\\assets\\Latitude90-Tabuleiro2.jpg")); //Bella
-			imgTabuleiro = ImageIO.read(new File("C:\\Users\\User\\Documents\\2021.2\\poo\\INF1636-POO-2021.2-JOGO\\assets\\Latitude90-Tabuleiro2.jpg")); //Rachel
+			imgTabuleiro = ImageIO.read(new File("C:\\Users\\Enzo\\Desktop\\Projetos\\INF1636-POO-2021.2-JOGO\\1iteracao-workspace\\1iteracao\\assets\\Latitude90-Tabuleiro2.jpg")); //Rachel
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		try {
 			//pecaSelecionada = ImageIO.read(new File("D:\\Eclipse Workspaces\\INF1636_Jogo_Novo\\INF1636-POO-2021.2-JOGO\\assets\\selecionado.png")); //Bella
-			pecaSelecionada = ImageIO.read(new File("C:\\Users\\User\\Documents\\2021.2\\poo\\INF1636-POO-2021.2-JOGO\\assets\\selecionado.png")); //Rachel
+			pecaSelecionada = ImageIO.read(new File("C:\\Users\\Enzo\\Desktop\\Projetos\\INF1636-POO-2021.2-JOGO\\1iteracao-workspace\\1iteracao\\assets\\selecionado.png")); //Rachel
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -110,7 +110,7 @@ class TabuleiroView extends JPanel implements MouseListener{
 		for(int i = 0; i < 4; i++) {
 			try {
 				//Image img = ImageIO.read(new File("D:\\Eclipse Workspaces\\INF1636_Jogo_Novo\\INF1636-POO-2021.2-JOGO\\assets\\jogador" + (i + 1) + ".png")); //Bella
-				Image img = ImageIO.read(new File("C:\\Users\\User\\Documents\\2021.2\\poo\\INF1636-POO-2021.2-JOGO\\assets\\jogador" + (i + 1) + ".png")); //Rachel
+				Image img = ImageIO.read(new File("C:\\Users\\Enzo\\Desktop\\Projetos\\INF1636-POO-2021.2-JOGO\\1iteracao-workspace\\1iteracao\\assets\\jogador" + (i + 1) + ".png")); //Rachel
 				imgPecas.put(CORES[i], img);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -122,7 +122,7 @@ class TabuleiroView extends JPanel implements MouseListener{
 		for(int i = 0; i < 6; i++) {
 			try {
 				//Image img = ImageIO.read(new File("D:\\Eclipse Workspaces\\INF1636_Jogo_Novo\\INF1636-POO-2021.2-JOGO\\assets\\dado" + (i + 1) + ".png")); //Bella
-				Image img = ImageIO.read(new File("C:\\Users\\User\\Documents\\2021.2\\poo\\INF1636-POO-2021.2-JOGO\\assets\\dado" + (i + 1) + ".png")); //Rachel
+				Image img = ImageIO.read(new File("C:\\Users\\Enzo\\Desktop\\Projetos\\INF1636-POO-2021.2-JOGO\\1iteracao-workspace\\1iteracao\\assets\\dado" + (i + 1) + ".png")); //Rachel
 				imgDados.put(Integer.valueOf(DADINHOS[i]), img);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -134,7 +134,7 @@ class TabuleiroView extends JPanel implements MouseListener{
 		for(int i = 0; i < 18; i++) {
 			try {
 				//Image img = ImageIO.read(new File("D:\\Eclipse Workspaces\\INF1636_Jogo_Novo\\INF1636-POO-2021.2-JOGO\\assets\\C" + (i + 1) + ".png")); //Bella
-				Image img = ImageIO.read(new File("C:\\Users\\User\\Documents\\2021.2\\poo\\INF1636-POO-2021.2-JOGO\\assets\\C" + (i + 1) + ".png")); //Rachel
+				Image img = ImageIO.read(new File("C:\\Users\\Enzo\\Desktop\\Projetos\\INF1636-POO-2021.2-JOGO\\1iteracao-workspace\\1iteracao\\assets\\C" + (i + 1) + ".png")); //Rachel
 				imgCartas.put(Integer.valueOf(CARTINHAS[i]), img);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -303,10 +303,13 @@ class TabuleiroView extends JPanel implements MouseListener{
 	private void lancaDados() {
 		btLancaDado.addActionListener(new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
+				notificarObservadores(1, "Ola");
+
+
 				//TODO: implementar observable para pegar os objetos do Model
-				dado1 = ControllerFacade.getModel().getValorDado();
-				dado2 = ControllerFacade.getModel().getValorDado();
-				dadoCol = ControllerFacade.getModel().getDadoColorido(dado1, dado2);
+				dado1 = ControllerFacade.getModelFacade().getValorDado();
+				dado2 = ControllerFacade.getModelFacade().getValorDado();
+				dadoCol = ControllerFacade.getModelFacade().getDadoColorido(dado1, dado2);
 				atualiza();
 			}
 			
@@ -830,4 +833,57 @@ class TabuleiroView extends JPanel implements MouseListener{
 	public void mouseExited(MouseEvent e) {}
 	public void mouseDragged(MouseEvent e) {}
 
+	protected List<Observador> observadores = new ArrayList<>();
+	private boolean hasChanged;
+
+	public void adicionarObservador(Observador o) {
+		if (!observadores.contains(o)) {
+			this.observadores.add(o);
+		}
+	}
+
+	public int contarObservadores() {
+		return this.observadores.size();
+	}
+
+	public void removerObservador(Observador o) {
+		if (this.observadores.contains(o)) {
+			this.observadores.remove(o);
+		}
+	}
+
+	public void notificarObservadores(Object ...args) {
+		for (Observador o : this.observadores) {
+			o.update(this, args);
+		}
+	}
+
+	public static void s(Object o) {
+		System.out.println(o);
+	}
+
+	@Override
+	public void update(Observavel o, Object... args) {
+		s("De " + o.getClass().getSimpleName() + " Para " + this.getClass().getSimpleName());
+
+		if (args == null) {
+			return;
+		}
+
+		final int operacao = (int) args[0];
+
+		String mensagem = null;
+
+		try {
+			mensagem = (String) args[1];
+		}
+		catch (ClassCastException ignored) {}
+
+		if (operacao == 1) {
+			s("Operacao 1. Msg: " + mensagem);
+		}
+		else {
+			s(o + " " + Arrays.asList(args).toString());
+		}
+	}
 }
